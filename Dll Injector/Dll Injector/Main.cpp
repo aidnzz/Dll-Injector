@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 		processName = argv[2];
 	else
 	{
-		
+		std::cout << asciiBanner;
 		std::cout << "  [Process name]> ";
 		std::cin >> processName;
 	}

@@ -92,5 +92,5 @@ void DllInjector::Inject(const char* const dllFile)
 		throw std::runtime_error("Error freeing memory from process!");
 	}
 
-	CloseHandle(processHandle_);
+	CloseHandle(remoteThread);
 }
