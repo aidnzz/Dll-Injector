@@ -82,13 +82,15 @@ void DllInjector::Inject(const char* const dllFile)
 	if (remoteThread == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Invalid handle in Inject function!");
 
+	std::cout << "  [+] Created remote thread" << std::endl;
+
 	std::cout << "  [*] Waiting for dll to finish executing!" << std::endl;
 	WaitForSingleObject(remoteThread, INFINITE);
 
 	std::cout << "  [+] Dll finished excecuting!" << std::endl;
-	if (!VirtualFree(pDllPath, NULL, MEM_RELEASE))
+	if (!VirtualFreeEx(processHandle_, pDllPath, NULL, MEM_RELEASE))
 	{
-		CloseHandle(pDllPath);
+		CloseHandle(remoteThread);
 		throw std::runtime_error("Error freeing memory from process!");
 	}
 
