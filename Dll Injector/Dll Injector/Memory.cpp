@@ -99,9 +99,6 @@ void DllInject::Inject(const char* const dllPath) const
 	if (!pDllPath)
 		throw std::runtime_error("Error reserving memory in target process!");
 
-	std::cout << "Dll path: " << pDllPath << std::endl;
-	std::cin.get();
-
 	if (!WriteBuffer<char>(dllPath, (DWORD)pDllPath, size))
 		throw std::runtime_error("Error writing to process!");
 

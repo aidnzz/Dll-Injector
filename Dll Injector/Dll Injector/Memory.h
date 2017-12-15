@@ -18,10 +18,10 @@ public:
 	DWORD GetModuleBaseAddr(const char* moduleName) const;
 
 	template<typename T>
-	T ReadProcess(const DWORD& addr, size_t size) const;
+	T ReadProcess(const DWORD& addr, const size_t size) const;
 
 	template<typename T>
-	bool Write(const T& data, const DWORD& addr, size_t size) const;
+	bool Write(const T& data, const DWORD& addr, const size_t size) const;
 
 	template<typename T>
 	bool WriteBuffer(const T* const data, const DWORD& addr, const size_t size) const;
