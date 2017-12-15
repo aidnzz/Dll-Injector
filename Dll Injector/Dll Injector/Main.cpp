@@ -14,7 +14,7 @@ R"(
 )"
 };
 
-bool startUp(DllInjector& inject, const char* const processName)
+bool startUp(DllInject& inject, const char* const processName)
 {
 	try
 	{
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 		std::cin >> processName;
 	}
 
-	DllInjector inject;
+	DllInject inject;
 
 	if (!startUp(inject, processName.c_str()))
 		return 1;
