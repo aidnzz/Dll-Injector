@@ -3,8 +3,7 @@
 
 #include "Memory.h"
 
-static const char asciiBanner[]
-{
+static const char asciiBanner[] = {
 R"(	 
      ___  ____  _        _         __          
     / _ \/ / / (_)__    (_)__ ____/ /____  ____
