@@ -17,13 +17,13 @@ public:
 	void Attach(const char* const processName, DWORD rights = PROCESS_ALL_ACCESS);
 	DWORD GetModuleBaseAddr(const char* moduleName) const;
 
-	template<typename T>
+	template<typename T = int>
 	T ReadProcess(const DWORD& addr, const size_t size) const;
 
-	template<typename T>
+	template<typename T = int>
 	bool Write(const T& data, const DWORD& addr, const size_t size) const;
 
-	template<typename T>
+	template<typename T = char>
 	bool WriteBuffer(const T* const data, const DWORD& addr, const size_t size) const;
 
 protected:

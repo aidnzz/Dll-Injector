@@ -21,7 +21,7 @@ bool startUp(DllInject& inject, const char* const processName)
 	}
 	catch (const std::runtime_error& e)
 	{
-		MessageBoxA(NULL, e.what(), NULL, MB_ICONERROR);
+		MessageBoxA(NULL, e.what(), nullptr, MB_ICONERROR);
 		return false;
 	}
 
@@ -29,7 +29,7 @@ bool startUp(DllInject& inject, const char* const processName)
 
 	if (!SetConsoleTitleA("Dll injector"))
 	{
-		unsigned int msgId = MessageBoxA(NULL, "Error setting console window title. Continue?", NULL, MB_ICONERROR | MB_YESNO);
+		unsigned int msgId = MessageBoxA(NULL, "Error setting console window title. Continue?", nullptr, MB_ICONERROR | MB_YESNO);
 		return msgId == IDYES ? true : false;
 	}
 

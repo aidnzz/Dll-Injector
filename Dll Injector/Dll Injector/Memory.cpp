@@ -3,7 +3,7 @@
 void Memory::Attach(const char* const processName, DWORD rights)
 {
 	PROCESSENTRY32 processEntry;
-	HANDLE processHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+	HANDLE processHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 	if (processHandle == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Invalid handle snapshot!");
@@ -69,14 +69,14 @@ template<typename T>
 T Memory::ReadProcess(const DWORD& addr, const size_t size) const
 {
 	T data;
-	ReadProcessMemory(processHandle_, (LPVOID)addr, &data, size, NULL)
+	ReadProcessMemory(processHandle_, (LPVOID)addr, &data, size, nullptr)
 	return data;
 }
 
 template<typename T>
 bool Memory::Write(const T& data, const DWORD& addr, const size_t size) const
 {
-	if (!WriteProcessMemory(processHandle_, (LPVOID)addr, &data, size, NULL))
+	if (!WriteProcessMemory(processHandle_, (LPVOID)addr, &data, size, nullptr))
 		return false;
 	return true;
 }
@@ -84,7 +84,7 @@ bool Memory::Write(const T& data, const DWORD& addr, const size_t size) const
 template<typename T>
 bool Memory::WriteBuffer(const T* const data, const DWORD& addr, const size_t size) const
 {
-	if (!WriteProcessMemory(processHandle_, (LPVOID)addr, data, size, NULL))
+	if (!WriteProcessMemory(processHandle_, (LPVOID)addr, data, size, nullptr))
 		return false;
 	return true;
 }
@@ -99,10 +99,10 @@ void DllInject::Inject(const char* const dllPath) const
 	if (!pDllPath)
 		throw std::runtime_error("Error reserving memory in target process!");
 
-	if (!WriteBuffer<char>(dllPath, (DWORD)pDllPath, size))
+	if (!WriteBuffer<>(dllPath, (DWORD)pDllPath, size))
 		throw std::runtime_error("Error writing to process!");
 
-	HANDLE remoteThread = CreateRemoteThread(processHandle_, NULL, NULL, (LPTHREAD_START_ROUTINE)loadLibAddr, pDllPath, 0, 0);
+	HANDLE remoteThread = CreateRemoteThread(processHandle_, 0, 0, (LPTHREAD_START_ROUTINE)loadLibAddr, pDllPath, 0, 0);
 
 	if (remoteThread == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Invalid handle in inject function!");
