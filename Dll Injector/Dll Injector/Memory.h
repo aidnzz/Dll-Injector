@@ -12,7 +12,7 @@ public:
         : pId_(0), processHandle(INVALID_HANDLE_VALUE), processName_(nullptr)
     {
     }
-    
+
 	~Memory()
 	{
 		if (processHandle_ == 0)
@@ -29,7 +29,8 @@ public:
 	bool Write(const T& data, const DWORD& addr, const size_t size) const;
 
 	template<typename T = char>
-	bool WriteBuffer(const T* const data, const DWORD& addr, const size_t size) const;
+	bool WriteBuffer(const T* const data, const DWORD& addr, const size_t size) const;	
+	
 
 protected:
 	DWORD pId_;
