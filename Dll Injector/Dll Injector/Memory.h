@@ -13,11 +13,11 @@ public:
     {
     }
     
-	~Memory()
-	{
-		if (processHandle_ == 0)
-			CloseHandle(processHandle_);
-	}
+~Memory()
+{
+	if (processHandle_ == 0)
+		CloseHandle(processHandle_);
+}
 
 	void Attach(const char* const processName, DWORD rights = PROCESS_ALL_ACCESS);
 	DWORD GetModuleBaseAddr(const char* moduleName) const;
