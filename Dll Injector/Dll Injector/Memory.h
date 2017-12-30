@@ -8,6 +8,11 @@
 class Memory
 {
 public:
+    Memory()
+        : pId_(0), processHandle(INVALID_HANDLE_VALUE), processName_(nullptr)
+    {
+    }
+    
 	~Memory()
 	{
 		if (processHandle_ == 0)
