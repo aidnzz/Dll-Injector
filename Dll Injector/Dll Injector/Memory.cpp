@@ -82,7 +82,7 @@ bool Memory::Write(const T& data, const DWORD& addr, const size_t size) const
 }
 
 template<typename T>
-bool Memory::WriteBuffer(const T* const data, const DWORD& addr, const size_t size) const
+bool Memory::WriteBuffer(const T const data, const DWORD& addr, const size_t size) const
 {
 	if (!WriteProcessMemory(processHandle_, (LPVOID)addr, data, size, nullptr))
 		return false;
