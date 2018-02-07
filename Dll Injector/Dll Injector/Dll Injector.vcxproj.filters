@@ -21,10 +21,16 @@
     <ClCompile Include="Memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Injector.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Injector.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

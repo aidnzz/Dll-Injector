@@ -1,119 +1,68 @@
 #include "Memory.h"
 
-void Memory::Attach(const char* const processName, DWORD rights)
-{
-	PROCESSENTRY32 processEntry;
-	HANDLE processHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+#include <stdexcept>
+#include <TlHelp32.h>
 
-	if (processHandle == INVALID_HANDLE_VALUE)
+void Memory::attach(const wchar_t* processName, DWORD dwAccessRights)
+{
+	PROCESSENTRY32W processEntry;
+	HANDLE hProcess = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+	if (hProcess == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Invalid handle snapshot!");
 
 	processEntry.dwSize = sizeof(PROCESSENTRY32W);
 
-	if (!Process32First(processHandle, &processEntry))
+	if (!Process32FirstW(hProcess, &processEntry))
 	{
-		CloseHandle(processHandle);
-		throw std::runtime_error("Process32First error");
+		CloseHandle(hProcess);
+		throw std::runtime_error("Error enumerating through processes");
 	}
-
-	processName_ = processName;
 
 	do
 	{
-		if (lstrcmp(processName, processEntry.szExeFile) == 0)
+		if (lstrcmpW(processName, processEntry.szExeFile) == 0) // Case sensitive string search
 		{
+			hProcess_ = OpenProcess(dwAccessRights, false, processEntry.th32ProcessID);
+			CloseHandle(hProcess);
+			
+			if (hProcess_ == nullptr)
+				throw std::runtime_error("Error opening process!");
+
 			pId_ = processEntry.th32ProcessID;
-			processHandle_ = OpenProcess(rights, NULL, pId_);
-			CloseHandle(processHandle);
 			return;
 		}
-	} while (Process32Next(processHandle, &processEntry));
+	} while (Process32NextW(hProcess, &processEntry));
 
-	CloseHandle(processHandle);
+	CloseHandle(hProcess);
 	throw std::runtime_error("Could not find process!");
 }
 
-DWORD Memory::GetModuleBaseAddr(const char* moduleName) const
+DWORD Memory::getModuleBaseAddr(const wchar_t* moduleName) const
 {
-	MODULEENTRY32 moduleEntry;
-	HANDLE moduleHandle = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pId_);
+	MODULEENTRY32W moduleEntry;
+	HANDLE hModule = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pId_);
 
-	if (moduleHandle == INVALID_HANDLE_VALUE)
+	if (hModule == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Invalid Handle value!");
 
-	moduleEntry.dwSize = sizeof(MODULEENTRY32);
+	moduleEntry.dwSize = sizeof(MODULEENTRY32W);
 
-	if (!Module32First(moduleHandle, &moduleEntry))
+	if (!Module32FirstW(hModule, &moduleEntry))
 	{
-		CloseHandle(moduleHandle);
+		CloseHandle(hModule);
 		throw std::runtime_error("Module32First error!");
 	}
 
-	if (moduleName == nullptr)
-		moduleName = processName_;
-
 	do
 	{
-		if (lstrcmp(moduleEntry.szModule, moduleName) == 0)
+		if (lstrcmpW(moduleEntry.szModule, moduleName) == 0) // Case sensitive string search
 		{
-			CloseHandle(moduleHandle);
+			CloseHandle(hModule);
 			return (DWORD)moduleEntry.modBaseAddr;
 		}
-	} while (Module32Next(moduleHandle, &moduleEntry));
+	} while (Module32NextW(hModule, &moduleEntry));
 
-	CloseHandle(moduleHandle);
+	CloseHandle(hModule);
 	throw std::runtime_error("Could not find process!");
-}
-
-template<typename T>
-T Memory::ReadProcess(const DWORD& addr, const size_t size) const
-{
-	T data;
-	ReadProcessMemory(processHandle_, (LPVOID)addr, &data, size, nullptr)
-	return data;
-}
-
-template<typename T>
-bool Memory::Write(const T& data, const DWORD& addr, const size_t size) const
-{
-	if (!WriteProcessMemory(processHandle_, (LPVOID)addr, &data, size, nullptr))
-		return false;
-	return true;
-}
-
-template<typename T>
-bool Memory::WriteBuffer(const T const data, const DWORD& addr, const size_t size) const
-{
-	if (!WriteProcessMemory(processHandle_, (LPVOID)addr, data, size, nullptr))
-		return false;
-	return true;
-}
-
-void DllInject::Inject(const char* const dllPath) const
-{
-	size_t size = strlen(dllPath) + 1;
-
-	LPVOID loadLibAddr = GetProcAddress(GetModuleHandleA("Kernel32.dll"), "LoadLibraryA");
-	LPVOID pDllPath = VirtualAllocEx(processHandle_, 0, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-
-	if (!pDllPath)
-		throw std::runtime_error("Error reserving memory in target process!");
-
-	if (!WriteBuffer<>(dllPath, (DWORD)pDllPath, size))
-		throw std::runtime_error("Error writing to process!");
-
-	HANDLE remoteThread = CreateRemoteThread(processHandle_, 0, 0, (LPTHREAD_START_ROUTINE)loadLibAddr, pDllPath, 0, 0);
-
-	if (remoteThread == INVALID_HANDLE_VALUE)
-		throw std::runtime_error("Invalid handle in inject function!");
-
-	WaitForSingleObject(remoteThread, INFINITE);
-
-	if (!VirtualFreeEx(processHandle_, pDllPath, NULL, MEM_RELEASE))
-	{
-		CloseHandle(remoteThread);
-		throw std::runtime_error("Error freeing memory from process!");
-	}
-
-	CloseHandle(remoteThread);
 }

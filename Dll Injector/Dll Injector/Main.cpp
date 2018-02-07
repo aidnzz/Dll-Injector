@@ -1,75 +1,75 @@
 #include <string>
 #include <iostream>
 
-#include "Memory.h"
+#include "Injector.h"
 
-static const char asciiBanner[] = {
+static const char banner[] = {
 R"(	 
-     ___  ____  _        _         __          
-    / _ \/ / / (_)__    (_)__ ____/ /____  ____
-   / // / / / / / _ \  / / -_) __/ __/ _ \/ __/
-  /____/_/_/ /_/_//_/_/ /\__/\__/\__/\___/_/    By ~ Incognito04
-                   |___/                       
+  ____  _     _     ___        _           _             
+ |  _ \| |   | |   |_ _|_ __  (_) ___  ___| |_ ___  _ __ 
+ | | | | |   | |    | || '_ \ | |/ _ \/ __| __/ _ \| '__|
+ | |_| | |___| |___ | || | | || |  __/ (__| || (_) | |   
+ |____/|_____|_____|___|_| |_|/ |\___|\___|\__\___/|_|   
+                            |__/                         
+
 )"
 };
 
-bool startUp(DllInject& inject, const char* const processName)
+static const char usage[] = {
+R"(
+  ============
+  Dll Injector
+  ============
+
+  Usage:
+    Dllinject.exe <DLL path> <process name>
+    Dllinject.exe <DLL path> 	
+)"
+};
+
+static void initialize(const wchar_t* processName, wchar_t* dllPath)
 {
+	Injector injector;
+	SetConsoleTitleA("Dll injector by incognito04");
+
 	try
 	{
-		inject.Attach(processName);
+		injector.attach(processName);
+		std::wcout << "\n[+] Attached to " << processName << " successfully!" << std::endl;
+
+		injector.inject(dllPath);
 	}
 	catch (const std::runtime_error& e)
 	{
-		MessageBoxA(NULL, e.what(), nullptr, MB_ICONERROR);
-		return false;
+		MessageBoxA(nullptr, e.what(), nullptr, MB_ICONERROR);
+		std::exit(1);
 	}
-
-	std::cout << "\n  [+] Attached to " << processName << " successfully!" << std::endl;
-
-	if (!SetConsoleTitleA("Dll injector"))
-	{
-		unsigned int msgId = MessageBoxA(NULL, "Error setting console window title. Continue?", nullptr, MB_ICONERROR | MB_YESNO);
-		return msgId == IDYES ? true : false;
-	}
-
-	return true;
 }
 
-int main(int argc, char* argv[])
+int wmain(int argc, wchar_t* argv[]) // For unicode support
 {
-	std::string processName;
+	std::wstring processName;
 
-	if (argc != 2)
+	if (argc == 1 || argc > 3)
 	{
-		std::cerr << " Dll Injector:\n\n"
-			      << "  Usage:\n\n"
-			      << "   Dllinject.exe <dll to inject> [<process name>]\n"
-			      << "   Dllinject.exe <dll to inject>" << std::endl;
-
-		std::cerr << "\n Press <Enter> to exit...";
-		std::cin.get();
-
+		std::cerr << usage << std::endl;
 		return 1;
 	}
 	else if (argc == 3)
+	{
+		std::cout << banner << std::endl;
 		processName = argv[2];
+	}
 	else
 	{
-		std::cout << asciiBanner;
-		std::cout << "  [Process name]> ";
-		std::cin >> processName;
+		std::cout << banner << std::endl;
+
+		std::cout << "Process name: ";
+		std::wcin >> processName;
 	}
 
-	DllInject inject;
-
-	if (!startUp(inject, processName.c_str()))
-		return 1;
-
-	inject.Inject(argv[1]);
-
-	std::cout << "  [+] Injection completed. Press <Enter> to exit";
-	std::cin.get(); std::cin.get();
+	initialize(processName.c_str(), argv[1]);
+	std::cout << "[+] DLL injection completed" << std::endl;
 
 	return 0;
 }
