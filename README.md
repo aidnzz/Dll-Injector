@@ -16,5 +16,25 @@ Dll Injector is a simple to use command line tool which efficiently injects dll'
 
 To use the simple Injector class:
    
-`injector.attach(processName);`
-`injector.inject(dllPath)`
+``` cpp
+#include "Injector.h"
+#include <iostream> // For input / output and exceptions
+
+int main()
+{
+  Injector injector
+  
+  try 
+  {
+    injector.attach(processName);
+    injector.inject(dllPath);
+  }
+  catch(const std::runtime_error& e) // To catch any exceptions
+  {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
+  
+  return 0;
+}
+```
