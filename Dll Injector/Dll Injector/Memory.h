@@ -2,47 +2,38 @@
 
 #include <Windows.h>
 #include <iostream>
-#include <stdexcept>
-#include <TlHelp32.h>
 
 class Memory
 {
 public:
-	~Memory()
+	Memory() // Make class data members usable
+		: pId_(0), hProcess_(nullptr), processName_(nullptr)
 	{
-		if (processHandle_ == 0)
-			CloseHandle(processHandle_);
 	}
 
-	void Attach(const char* const processName, DWORD rights = PROCESS_ALL_ACCESS);
-	DWORD GetModuleBaseAddr(const char* moduleName) const;
+	~Memory()
+	{
+		CloseHandle(hProcess_);
+	}
 
-	template<typename T = uint32_t>
-	T ReadProcess(const DWORD& addr, const size_t size) const;
+	void attach(const wchar_t* processName, DWORD dwAccessRights = PROCESS_ALL_ACCESS);
+	DWORD getbaseAddress(const wchar_t* moduleName); // If a nullptr is passed will use process name as module name
 
-	template<typename T = uint32_t>
-	bool Write(const T& data, const DWORD& addr, const size_t size) const;
+	template<typename T>
+	bool readProcess(const DWORD addr, T buffer, const size_t size) const; // Destination, Buffer, Bytes of data
 
-	template<typename T = uint8_t*>
-	bool WriteBuffer(const T const data, const DWORD& addr, const size_t size) const;
+	template<typename T>
+	bool write(const DWORD addr, T data, const size_t size) const; // Destination, Data, Bytes of data
+
+	template<typename T>
+	bool writeBuffer(const DWORD addr, T data, const size_t size) const; // Destination, Data, Bytes of data
 
 protected:
 	DWORD pId_;
-	HANDLE processHandle_;
-	const char* processName_;
+	HANDLE hProcess_;
 
 private:
-	friend std::ostream& operator<<(std::ostream& stream, Memory &obj)
-	{
-		stream << "Process name: " << obj.processName_ << " process identifier: " << std::hex << obj.pId_;
-		return stream;
-	}
+	const wchar_t* processName_;
+	friend std::wostream& operator<<(std::wostream& stream, const Memory& obj);
 
 };
-
-class DllInject : public Memory
-{
-public:
-	void Inject(const char* const dllPath) const;
-};
-

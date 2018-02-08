@@ -5,5 +5,5 @@
 class Injector : public Memory
 {
 public:
-	void inject(wchar_t* dllPath) const;
+	void inject(const wchar_t* dllPath) const;
 };
