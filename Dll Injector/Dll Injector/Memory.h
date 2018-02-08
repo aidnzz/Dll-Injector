@@ -19,14 +19,11 @@ public:
 	void attach(const wchar_t* processName, DWORD dwAccessRights = PROCESS_ALL_ACCESS);
 	DWORD getbaseAddress(const wchar_t* moduleName); // If a nullptr is passed will use process name as module name
 
-	template<typename T>
-	bool readProcess(const DWORD addr, T buffer, const size_t size) const; // Destination, Buffer, Bytes of data
+	bool readProcess(const DWORD addr, int buffer, const size_t size) const; // Destination, Buffer, Bytes of data
 
-	template<typename T>
-	bool write(const DWORD addr, T data, const size_t size) const; // Destination, Data, Bytes of data
+	bool write(const DWORD addr, int data, const size_t size) const; // Destination, Data, Bytes of data
 
-	template<typename T>
-	bool writeBuffer(const DWORD addr, T data, const size_t size) const; // Destination, Data, Bytes of data
+	bool writeBuffer(const DWORD addr, const wchar_t* data, const size_t size) const; // Destination, Data, Bytes of data
 
 protected:
 	DWORD pId_;

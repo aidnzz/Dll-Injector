@@ -27,7 +27,7 @@ R"(
 )"
 };
 
-static void initialize(const wchar_t* processName, wchar_t* dllPath)
+static void initialize(const wchar_t* processName, const wchar_t* dllPath)
 {
 	Injector injector;
 	SetConsoleTitleA("Dll injector by incognito04");

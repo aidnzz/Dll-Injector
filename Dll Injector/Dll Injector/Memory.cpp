@@ -72,26 +72,23 @@ DWORD Memory::getbaseAddress(const wchar_t* moduleName)
 	throw std::runtime_error("Could not find process!");
 }
 
-template<typename T>
-bool Memory::readProcess(const DWORD addr, T data, const size_t size) const
+bool Memory::readProcess(const DWORD addr, int data, const size_t size) const
 {
 	if (!ReadProcessMemory(hProcess_, (LPCVOID)addr, &data, size, nullptr))
 		return false;
 	return true;
 }
 
-template<typename T>
-bool Memory::write(const DWORD addr, T data, const size_t size) const
+bool Memory::write(const DWORD addr, int data, const size_t size) const
 {
-	if (!WriteProcessMemory(hProcess_, (LPCVOID)addr, &data, size, nullptr))
+	if (!WriteProcessMemory(hProcess_, (LPVOID)addr, &data, size, nullptr))
 		return false;
 	return true;
 }
 
-template<typename T>
-bool Memory::writeBuffer(const DWORD addr, T data, const size_t size) const
+bool Memory::writeBuffer(const DWORD addr, const wchar_t* data, const size_t size) const
 {
-	if (!WriteProcessMemory(hProcess_, (LPCVOID)addr, data, size, nullptr))
+	if (!WriteProcessMemory(hProcess_, (LPVOID)addr, data, size, nullptr))
 		return false;
 	return true;
 }
