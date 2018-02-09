@@ -20,7 +20,7 @@ A simple dll injector which uses VirtualAllocEx and CreateRemoteThread to launch
 
 int main()
 {
-  Injector injector
+  Injector injector;
   
   try 
   {
