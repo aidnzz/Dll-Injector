@@ -12,7 +12,7 @@ A simple dll injector which uses VirtualAllocEx and CreateRemoteThread to launch
     Dllinject.exe <DLL path>
 ```
 
-To use the simple Injector class:
+# To use the simple Injector class:
    
 ``` cpp
 #include "Injector.h"
