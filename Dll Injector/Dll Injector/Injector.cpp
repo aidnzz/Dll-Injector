@@ -3,9 +3,11 @@
 #include <Windows.h>
 #include <stdexcept>
 
+#define wsizeof(wString) (lstrlenW(wString) * sizeof(wchar_t)) + 1 
+
 void Injector::inject(const wchar_t* dllPath) const
 {
-	const size_t size = (lstrlenW(dllPath) * 2) + 1; // Times by two as wchar_t is two times bigger than char. The " + 1 " is for the addition null byte at end of string
+	const size_t size = wsizeof(dllPath);
 
 	LPVOID loadLibAddr = GetProcAddress(GetModuleHandleA("Kernel32.dll"), "LoadLibraryW"); // Gets address of loadlibraryw for unicode support when loading dll path
 	LPVOID pDllPath = VirtualAllocEx(hProcess_, nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
