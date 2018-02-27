@@ -19,7 +19,7 @@ void Memory::attach(const wchar_t* processName, DWORD dwAccessRights)
 		throw std::runtime_error("Error enumerating through processes!");
 	}
 
-	processName_ = processName; // set process name
+	szProcessName_ = processName; // set process name
 
 	do
 	{
@@ -57,7 +57,7 @@ DWORD Memory::getbaseAddress(const wchar_t* moduleName)
 	}
 
 	if (moduleName == nullptr)
-		moduleName = processName_;
+		moduleName = szProcessName_;
 
 	do
 	{
@@ -74,7 +74,7 @@ DWORD Memory::getbaseAddress(const wchar_t* moduleName)
 
 bool Memory::readProcess(const DWORD addr, int data, const size_t size) const
 {
-	if (!ReadProcessMemory(hProcess_, (LPCVOID)addr, &data, size, nullptr))
+	if (!ReadProcessMemory(hProcess_, (LPCVOID)addr, &data, static_cast<SIZE_T>(size), nullptr))
 		return false;
 	return true;
 }
@@ -95,5 +95,5 @@ bool Memory::writeBuffer(const DWORD addr, const wchar_t* data, const size_t siz
 
 std::wostream& operator<<(std::wostream& stream, const Memory& obj)
 {
-	return stream << "Process name: " << obj.processName_ << " process identifier: " << obj.pId_;
+	return stream << "Process name: " << obj.szProcessName_ << " process identifier: " << obj.pId_;
 }
