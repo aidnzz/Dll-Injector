@@ -1,13 +1,13 @@
 #pragma once
 
 #include <Windows.h>
-#include <iostream>
+#include <iostream> // wostream
 
 class Memory
 {
 public:
 	Memory() // Make class data members usable
-		: pId_(0), hProcess_(nullptr), processName_(nullptr)
+		: pId_(0), hProcess_(nullptr), szProcessName_(nullptr)
 	{
 	}
 
@@ -30,7 +30,7 @@ protected:
 	HANDLE hProcess_;
 
 private:
-	const wchar_t* processName_;
+	const wchar_t* szProcessName_;
 	friend std::wostream& operator<<(std::wostream& stream, const Memory& obj);
 
 };
