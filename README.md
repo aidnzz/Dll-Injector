@@ -20,16 +20,16 @@ A simple dll injector which uses VirtualAllocEx and CreateRemoteThread to launch
 
 int main()
 {
-  Injector injector;
-  
   try 
   {
+    Injector injector;
+    
     injector.attach(processName);
     injector.inject(dllPath);
   }
   catch(const std::runtime_error& e) // To catch any exceptions
   {
-    std::cerr << e.what() << std::endl;
+    std::cerr << e.what() << '\n';
     return 1;
   }
   
