@@ -1,43 +1,40 @@
-#include "Injector.h"
+#include "injector.h"
 
-#include <Windows.h>
-#include <stdexcept>
-
-#define wsizeof(wString) (lstrlenW(wString) * sizeof(wchar_t)) + 1 
+#define LOADLIBRARYW "LoadLibraryW"
+#define KERNEL32 "Kernel32.dll"
 
 void Injector::inject(const wchar_t* dllPath) const
 {
-	wchar_t buffer[MAX_PATH + 1] = {  };
+	WCHAR szFullPath[261]; 
+	UINT nSize = sizeof(szFullPath); // Get size of buffer in bytes
 
-	GetFullPathNameW(dllPath, MAX_PATH, buffer, nullptr);
-	const size_t nSize = wsizeof(buffer);
+	ZeroMemory(szFullPath, nSize);
+	GetFullPathNameW(dllPath, 260, szFullPath, nullptr);
 
-	LPVOID loadLibAddr = GetProcAddress(GetModuleHandleA("Kernel32.dll"), "LoadLibraryW"); // Gets address of loadlibraryw for unicode support when loading dll path
-	LPVOID lpDllPath = VirtualAllocEx(hProcess_, nullptr, nSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	HMODULE hModule = GetModuleHandleA(KERNEL32);
+	LPVOID addr = GetProcAddress(hModule, LOADLIBRARYW); 
 
-	if (lpDllPath == nullptr)
-		throw std::runtime_error("Error reserving process memory!");
+	LPVOID lpParam = VirtualAllocEx(m_hProcess, nullptr, nSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE); // Allocate Memory for buffer
 
-	if (!writeBuffer((DWORD)lpDllPath, buffer, nSize))
+	if (lpParam == nullptr)
+		throw std::runtime_error("Error: could not reserving memory in process!");
+
+	if (!writeBuffer(reinterpret_cast<uintptr_t>(lpParam), szFullPath, nSize))
 	{
-		VirtualFreeEx(hProcess_, lpDllPath, 0, MEM_RELEASE);
-		throw std::runtime_error("Error writing dll path to process");
+		VirtualFreeEx(m_hProcess, addr, 0, MEM_RELEASE);
+		throw std::runtime_error("Error: could not write dll path to process");
 	}
 
-	HANDLE hRemoteThread = CreateRemoteThread(hProcess_, nullptr, nSize, (LPTHREAD_START_ROUTINE)loadLibAddr, lpDllPath, NULL, nullptr);
-	if (hRemoteThread == nullptr)
+	HANDLE hThread = CreateRemoteThread(m_hProcess, nullptr, 0, static_cast<LPTHREAD_START_ROUTINE>(addr), lpParam, 0, nullptr);
+
+	if (hThread == nullptr)
 	{
-		VirtualFreeEx(hProcess_, lpDllPath, 0, MEM_RELEASE);
-		throw std::runtime_error("Error creating remote thread!");
+		VirtualFreeEx(m_hProcess, addr, 0, MEM_RELEASE);
+		throw std::runtime_error("Error: could not create remote thread!");
 	}
 
-	CloseHandle(hRemoteThread);
-
-	if (!VirtualFreeEx(hProcess_,
-		lpDllPath,
-		0,
-		MEM_RELEASE))
-	{
-		throw std::runtime_error("Error freeing memory from process!");
-	}
+	WaitForSingleObject(hThread, INFINITE);
+	
+	VirtualFreeEx(m_hProcess, addr, 0, MEM_RELEASE);
+	CloseHandle(hThread);
 }
