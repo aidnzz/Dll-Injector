@@ -1,36 +1,57 @@
 #pragma once
 
 #include <Windows.h>
-#include <iostream> // wostream
+#include <ostream> // wostream
+
+struct Module
+{
+	uintptr_t baseAddr;
+	DWORD dwSize;
+};
+
 
 class Memory
 {
 public:
 	Memory() // Make class data members usable
-		: pId_(0), hProcess_(nullptr), szProcessName_(nullptr)
+		: m_pId(0), m_hProcess(nullptr), m_szProcessName(nullptr)
 	{
 	}
 
 	~Memory()
 	{
-		CloseHandle(hProcess_);
+		if (m_hProcess != nullptr || m_hProcess != INVALID_HANDLE_VALUE)
+		{
+			CloseHandle(m_hProcess);
+			m_hProcess = nullptr;
+		}
 	}
 
-	void attach(const wchar_t* processName, DWORD dwAccessRights = PROCESS_ALL_ACCESS);
-	DWORD getbaseAddress(const wchar_t* moduleName); // If a nullptr is passed will use process name as module name
+	void attach(const wchar_t* szProcessName, DWORD dwAccessRights = PROCESS_ALL_ACCESS);
+	Module getModuleInfo(const wchar_t* szModuleName);
+	
+	bool writeBuffer(uintptr_t addr, LPCVOID buffer, uint32_t nSize) const;
+	
+	template<typename T>
+	inline bool write(uintptr_t addr, T data, uint32_t nSize = sizeof(T)) const
+	{
+		return WriteProcessMemory(m_hProcess, reinterpret_cast<LPVOID>(addr), &data, nSize, nullptr);
+	}
 
-	bool readProcess(const DWORD addr, int buffer, const size_t size) const; // Destination, Buffer, Bytes of data
-
-	bool write(const DWORD addr, int data, const size_t size) const; // Destination, Data, Bytes of data
-
-	bool writeBuffer(const DWORD addr, const wchar_t* data, const size_t size) const; // Destination, Data, Bytes of data
+	template<typename T> // To add error handling
+	T read(uintptr_t addr) const
+	{
+		T data;
+		ReadProcessMemory(m_hProcess, reinterpret_cast<LPVOID>(addr), &data, sizeof(data), nullptr);
+		return data;
+	}
 
 protected:
-	DWORD pId_;
-	HANDLE hProcess_;
+	DWORD m_pId;
+	HANDLE m_hProcess;
 
 private:
-	const wchar_t* szProcessName_;
-	friend std::wostream& operator<<(std::wostream& stream, const Memory& obj);
+	const wchar_t* m_szProcessName;
+	friend std::wostream& operator<<(std::wostream&, const Memory&);
 
 };
