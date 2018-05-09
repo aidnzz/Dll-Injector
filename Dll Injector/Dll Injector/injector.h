@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Memory.h"
+#include "memory.h"
 
-class Injector : public Memory
+struct Injector : public Memory
 {
-public:
 	void inject(const wchar_t* dllPath) const;
 };
