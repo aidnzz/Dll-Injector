@@ -30,7 +30,11 @@ public:
 	void attach(const wchar_t* szProcessName, DWORD dwAccessRights = PROCESS_ALL_ACCESS);
 	Module getModuleInfo(const wchar_t* szModuleName);
 	
-	bool writeBuffer(uintptr_t addr, LPCVOID buffer, uint32_t nSize) const;
+	inline bool writeBuffer(uintptr_t addr, LPCVOID buffer, uint32_t nSize) const
+	{
+		return WriteProcessMemory(m_hProcess, reinterpret_cast<LPVOID>(addr), buffer, nSize, nullptr);
+	}
+
 	
 	template<typename T>
 	inline bool write(uintptr_t addr, T data, uint32_t nSize = sizeof(T)) const
@@ -38,7 +42,7 @@ public:
 		return WriteProcessMemory(m_hProcess, reinterpret_cast<LPVOID>(addr), &data, nSize, nullptr);
 	}
 
-	template<typename T> // To add error handling
+	template<typename T> 
 	T read(uintptr_t addr) const
 	{
 		T data;

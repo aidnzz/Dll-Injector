@@ -71,11 +71,6 @@ Module Memory::getModuleInfo(const wchar_t* szModuleName)
 	throw std::runtime_error("Error: could not find module!");
 }
 
-bool Memory::writeBuffer(uintptr_t addr, LPCVOID buffer, uint32_t nSize) const
-{
-	return WriteProcessMemory(m_hProcess, reinterpret_cast<LPVOID>(addr), buffer, nSize, nullptr);
-}
-
 std::wostream& operator<<(std::wostream& stream, const Memory& other)
 {
 	return stream << "Process name: " << other.m_szProcessName << " process identifier: " << other.m_pId;
