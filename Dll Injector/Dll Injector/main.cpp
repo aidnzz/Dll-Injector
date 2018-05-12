@@ -27,23 +27,25 @@ R"(
 )"
 };
 
-static void initialize(const wchar_t* processName, const wchar_t* dllPath)
+static bool initialize(const wchar_t* processName, const wchar_t* dllPath)
 {
-	Injector injector;
+	
 	SetConsoleTitleA("Dll injector by incognito04");
 
 	try
 	{
+		Injector injector;
+		
 		injector.attach(processName);
-		std::wcout << "\n[+] Attached to " << processName << " successfully!" << std::endl;
-
 		injector.inject(dllPath);
 	}
 	catch (const std::runtime_error& e)
 	{
 		MessageBoxA(nullptr, e.what(), nullptr, MB_ICONERROR);
-		std::exit(1);
+		return false;
 	}
+	
+	return true;
 }
 
 int wmain(int argc, wchar_t* argv[]) // For unicode support
@@ -52,24 +54,24 @@ int wmain(int argc, wchar_t* argv[]) // For unicode support
 
 	if (argc == 1 || argc > 3)
 	{
-		std::cerr << usage << std::endl;
+		std::cerr << usage << '\n';
 		return 1;
 	}
 	else if (argc == 3)
 	{
-		std::cout << banner << std::endl;
+		std::cout << banner << '\n';
 		processName = argv[2];
 	}
 	else
 	{
-		std::cout << banner << std::endl;
+		std::cout << banner << '\n';
 
 		std::cout << "Process name: ";
 		std::wcin >> processName;
 	}
 
-	initialize(processName.c_str(), argv[1]);
-	std::cout << "[+] DLL injection completed" << std::endl;
+	const bool status = initialize(processName.c_str(), argv[1]);
+	std::cout << "DLL injection " << (status ? "completed sucessfully" : "failed") << '\n';
 
 	return 0;
 }
