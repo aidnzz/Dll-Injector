@@ -15,7 +15,7 @@ A simple dll injector which uses VirtualAllocEx and CreateRemoteThread to launch
 ### To use the simple Injector class:
    
 ``` cpp
-#include "Injector.h"
+#include "injector.h"
 #include <iostream> // For input / output and exceptions
 
 int main()
