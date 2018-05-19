@@ -1,8 +1,8 @@
 #include "injector.h"
 #include <iostream>
 
-#define LOADLIBRARYW "LoadLibraryW"
-#define KERNEL32 "Kernel32.dll"
+#define LOADLIBRARYW  "LoadLibraryW"
+#define KERNEL32      "Kernel32.dll"
 
 void Injector::inject(const wchar_t* dllPath) const
 {
@@ -28,7 +28,7 @@ void Injector::inject(const wchar_t* dllPath) const
 		throw std::runtime_error("Error: could not write dll path to process");
 	}
 
-	std::cout << "[+] Wrote DLL path to " << std::hex << reinterpret_cast<uintptr_t>(addr) << " in process memory" << '\n';
+	std::cout << "[+] Wrote DLL path to " << std::hex << std::showbase << reinterpret_cast<uintptr_t>(addr) << " in process memory" << '\n';
 
 	HANDLE hThread = CreateRemoteThread(m_hProcess, nullptr, 0, static_cast<LPTHREAD_START_ROUTINE>(addr), lpParam, 0, nullptr);
 
