@@ -46,8 +46,8 @@ int wmain(int argc, wchar_t* argv[]) // For unicode support
 {
 	if (argc == 1 || argc > 3)
 	{
-		std::wcerr << "Usage: " << argv[0] << " [DLL Path] [Process]" << '\n'
-				   << "       " << argv[0] << " [DLL Path]" << '\n';
+		std::wcerr << "Usage: " << argv[0] << " [DLL Path] [Process]" << '\n';
+		std::wcerr << "       " << argv[0] << " [DLL Path]" << '\n';
 		
 		return 1;
 	}
