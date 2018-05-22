@@ -63,19 +63,20 @@ int wmain(int argc, wchar_t* argv[]) // For unicode support
 	}
 
 	SetConsoleTitleA("Injector by: incognito04");
-
+	
 	WriteConsoleA(hStdOut, banner, strlen(banner), nullptr, nullptr);
 
 	if (argc == 3)
 		StringCbCopyW(szProcessName, MAX_PATH, argv[2]);
-
 	else
 	{
 		std::cout << "Process> ";
 		std::wcin.getline(szProcessName, MAX_PATH);
 	}
 
-	const bool bStatus = inject({ szProcessName, argv[1] });
+	InjectInfo info = { szProcessName, argv[1] };
+	const bool bStatus = inject(info);
+	
 	std::cout << "\n[-] DLL injection " << (bStatus ? "completed sucessfully" : "failed") << '\n';
 
 	return 0;
