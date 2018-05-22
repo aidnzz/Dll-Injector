@@ -24,7 +24,7 @@ void Injector::inject(const wchar_t* dllPath) const
 
 	if (!writeBuffer(reinterpret_cast<uintptr_t>(lpParam), szFullPath, nSize))
 	{
-		VirtualFreeEx(m_hProcess, addr, 0, MEM_RELEASE);
+		VirtualFreeEx(m_hProcess, lpParam, 0, MEM_RELEASE);
 		throw std::runtime_error("Error: could not write dll path to process");
 	}
 
@@ -34,13 +34,13 @@ void Injector::inject(const wchar_t* dllPath) const
 
 	if (hThread == nullptr)
 	{
-		VirtualFreeEx(m_hProcess, addr, 0, MEM_RELEASE);
+		VirtualFreeEx(m_hProcess, lpParam, 0, MEM_RELEASE);
 		throw std::runtime_error("Error: could not create remote thread!");
 	}
 
 	std::cout << "[+] Executing DLL in target process! " << '\n';
 	WaitForSingleObject(hThread, INFINITE);
 
-	VirtualFreeEx(m_hProcess, addr, 0, MEM_RELEASE);
+	VirtualFreeEx(m_hProcess, lpParam, 0, MEM_RELEASE);
 	CloseHandle(hThread);
 }
