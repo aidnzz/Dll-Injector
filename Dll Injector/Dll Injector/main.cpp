@@ -74,7 +74,7 @@ int wmain(int argc, wchar_t* argv[]) // For unicode support
 		std::wcin.getline(szProcessName, MAX_PATH);
 	}
 
-	InjectInfo info = { szProcessName, argv[1] };
+	const InjectInfo info = { szProcessName, argv[1] };
 	const bool bStatus = inject(info);
 	
 	std::cout << "\n[-] DLL injection " << (bStatus ? "completed sucessfully" : "failed") << '\n';
