@@ -8,8 +8,8 @@ A simple dll injector which uses VirtualAllocEx and CreateRemoteThread to launch
   ============
 
   Usage:
-    Dllinject.exe <DLL path> <process name>
-    Dllinject.exe <DLL path>
+    Dllinject.exe [DLL path] [Process name]
+    Dllinject.exe [DLL path]
 ```
 
 ### To use the simple Injector class:
