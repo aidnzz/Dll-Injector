@@ -4,5 +4,5 @@
 
 struct Injector : public Memory
 {
-	void inject(const wchar_t* dllPath) const;
+    void inject(const wchar_t* dllPath) const;
 };
