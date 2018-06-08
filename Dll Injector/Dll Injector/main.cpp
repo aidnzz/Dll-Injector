@@ -19,8 +19,8 @@ R"(
 
 struct InjectInfo
 {
-    const wchar_t* szProcessName;
-    const wchar_t* szDllPath;
+    LPCWSTR szProcessName;
+    LPCWSTR szDllPath;
 };
 
 static bool inject(const InjectInfo& info)
