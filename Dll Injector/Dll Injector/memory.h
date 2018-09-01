@@ -13,10 +13,7 @@ struct Module
 class Memory
 {
 public:
-    Memory() // Make class data members usable
-        : m_pId(0), m_hProcess(nullptr), m_szProcessName(nullptr)
-    {
-    }
+    Memory() = default;
 
     ~Memory()
     {
